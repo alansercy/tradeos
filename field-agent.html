@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1A1A2E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>TradeOS Field Agent</title>
+<style>
+:root {
+  --bg: #1A1A2E;
+  --card: #16213E;
+  --card2: #0F3460;
+  --yellow: #F5C518;
+  --yellow-dim: rgba(245,197,24,0.15);
+  --yellow-border: rgba(245,197,24,0.35);
+  --text: #FFFFFF;
+  --muted: #8899BB;
+  --success: #27AE60;
+  --danger: #E74C3C;
+  --border: rgba(255,255,255,0.08);
+  --nav-h: 76px;
+  --header-h: 58px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%;height:100dvh}
+body{height:100%;height:100dvh;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+
+/* ── HEADER ── */
+.app-header{
+  height:var(--header-h);display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;background:var(--card);border-bottom:2px solid var(--yellow);
+  flex-shrink:0;position:relative;z-index:10;
+}
+.header-logo{font-size:22px;font-weight:900;color:var(--yellow);letter-spacing:1px;display:flex;align-items:center;gap:6px}
+.header-logo svg{width:22px;height:22px}
+.header-badge{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+  background:var(--yellow-dim);border:1px solid var(--yellow-border);color:var(--yellow);
+  padding:4px 10px;border-radius:20px;
+}
+.offline-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--success);
+  box-shadow:0 0 6px var(--success);display:inline-block;margin-right:4px;
+}
+
+/* ── MAIN CONTENT ── */
+.main-content{
+  flex:1;overflow:hidden;position:relative;
+  height:calc(100dvh - var(--header-h) - var(--nav-h));
+}
+.tab-section{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding:16px 16px 20px;
+  opacity:0;pointer-events:none;transition:opacity .18s;
+  -webkit-overflow-scrolling:touch;
+}
+.tab-section.active{opacity:1;pointer-events:auto}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  height:var(--nav-h);display:flex;background:var(--card);
+  border-top:2px solid var(--yellow);flex-shrink:0;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;border:none;background:transparent;color:var(--muted);
+  cursor:pointer;transition:color .15s;padding:0;min-width:0;
+}
+.nav-btn.active{color:var(--yellow)}
+.nav-btn svg{width:26px;height:26px;stroke-width:1.8}
+.nav-btn span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+
+/* ── SECTION HEADER ── */
+.section-title{
+  font-size:22px;font-weight:800;color:var(--yellow);margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+}
+.section-title svg{width:24px;height:24px}
+
+/* ── FORM ELEMENTS ── */
+.field-group{margin-bottom:14px}
+.field-label{
+  display:block;font-size:12px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.8px;color:var(--muted);margin-bottom:6px;
+}
+select,input[type=text],input[type=number],textarea{
+  width:100%;padding:15px 16px;
+  background:var(--card);border:2px solid var(--border);
+  border-radius:12px;color:var(--text);font-size:18px;
+  -webkit-appearance:none;appearance:none;outline:none;
+  min-height:54px;transition:border-color .15s;
+}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23F5C518' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:42px}
+select:focus,input:focus,textarea:focus{border-color:var(--yellow-border)}
+select option{background:var(--card);color:var(--text)}
+textarea{min-height:100px;resize:none;line-height:1.5}
+input[type=number]{-moz-appearance:textfield}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+
+/* ── BUTTONS ── */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:100%;min-height:62px;padding:16px 20px;
+  border:none;border-radius:16px;font-size:18px;font-weight:800;
+  text-transform:uppercase;letter-spacing:.8px;cursor:pointer;
+  transition:transform .1s,opacity .15s;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--yellow);color:var(--bg)}
+.btn-primary:active{background:#D4A800}
+.btn-secondary{background:var(--card2);color:var(--text);border:2px solid var(--border)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn svg{width:22px;height:22px;flex-shrink:0}
+.btn-sm{min-height:46px;font-size:14px;padding:10px 16px}
+
+/* ── PHASE GRID ── */
+.phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.phase-tile{
+  background:var(--card);border:2px solid var(--border);
+  border-radius:16px;padding:20px 12px;text-align:center;
+  cursor:pointer;transition:all .15s;min-height:90px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+}
+.phase-tile svg{width:30px;height:30px;color:var(--muted)}
+.phase-tile span{font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.phase-tile.selected{border-color:var(--yellow);background:var(--yellow-dim)}
+.phase-tile.selected svg,.phase-tile.selected span{color:var(--yellow)}
+.phase-tile:active{opacity:.7}
+
+/* ── PASS/FAIL TOGGLE ── */
+.verdict-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.verdict-btn{
+  min-height:90px;border-radius:20px;font-size:22px;font-weight:900;
+  border:3px solid transparent;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  letter-spacing:1px;transition:all .15s;background:var(--card);color:var(--muted);
+}
+.verdict-btn svg{width:34px;height:34px}
+.verdict-btn.pass{border-color:var(--success);color:var(--success)}
+.verdict-btn.pass.selected{background:var(--success);color:#fff}
+.verdict-btn.fail{border-color:var(--danger);color:var(--danger)}
+.verdict-btn.fail.selected{background:var(--danger);color:#fff}
+.verdict-btn:active{opacity:.7}
+
+/* ── HOURS STEPPER ── */
+.hours-stepper{display:flex;align-items:center;gap:0;border-radius:12px;overflow:hidden;border:2px solid var(--border)}
+.step-btn{
+  background:var(--card2);color:var(--yellow);border:none;
+  width:64px;min-height:54px;font-size:28px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-btn:active{background:#1a2a50}
+.step-display{
+  flex:1;text-align:center;font-size:32px;font-weight:900;
+  background:var(--card);color:var(--text);min-height:54px;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ── CARDS / LOG ENTRIES ── */
+.log-heading{
+  font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--muted);margin:20px 0 10px;border-top:1px solid var(--border);padding-top:16px;
+}
+.log-card{
+  background:var(--card);border-radius:12px;padding:14px 16px;
+  margin-bottom:8px;border-left:3px solid var(--yellow);
+}
+.log-card-title{font-size:16px;font-weight:700;color:var(--text)}
+.log-card-sub{font-size:13px;color:var(--muted);margin-top:3px}
+.log-card-badge{
+  display:inline-block;font-size:11px;font-weight:700;text-transform:uppercase;
+  padding:3px 8px;border-radius:6px;margin-top:6px;
+}
+.badge-yellow{background:var(--yellow-dim);color:var(--yellow);border:1px solid var(--yellow-border)}
+.badge-green{background:rgba(39,174,96,.15);color:var(--success);border:1px solid rgba(39,174,96,.3)}
+.badge-red{background:rgba(231,76,60,.15);color:var(--danger);border:1px solid rgba(231,76,60,.3)}
+.badge-blue{background:rgba(52,152,219,.15);color:#3498DB;border:1px solid rgba(52,152,219,.3)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-size:15px}
+.empty-state svg{width:48px;height:48px;margin-bottom:12px;opacity:.4;display:block;margin-left:auto;margin-right:auto}
+
+/* ── PHOTO GRID ── */
+.photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.photo-thumb{
+  aspect-ratio:1;border-radius:10px;overflow:hidden;position:relative;
+  background:var(--card);border:1px solid var(--border);
+}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-thumb-badge{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(0,0,0,.7);padding:3px 5px;
+  font-size:9px;font-weight:700;color:var(--yellow);text-transform:uppercase;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.upload-indicator{
+  display:flex;align-items:center;gap:8px;
+  background:var(--yellow-dim);border:1px solid var(--yellow-border);
+  border-radius:10px;padding:10px 14px;margin-top:12px;font-size:14px;color:var(--yellow);font-weight:700;
+}
+.upload-indicator svg{width:18px;height:18px;flex-shrink:0}
+
+/* ── CAMERA BUTTON ── */
+.camera-hero{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--card);border:2px dashed var(--yellow-border);border-radius:20px;
+  padding:40px 20px;cursor:pointer;transition:all .15s;min-height:180px;
+  margin-bottom:12px;
+}
+.camera-hero:active{background:var(--yellow-dim);border-color:var(--yellow)}
+.camera-hero svg{width:56px;height:56px;color:var(--yellow);margin-bottom:12px}
+.camera-hero-text{font-size:20px;font-weight:800;color:var(--yellow)}
+.camera-hero-sub{font-size:14px;color:var(--muted);margin-top:4px}
+
+/* ── TOAST ── */
+.toast-container{position:fixed;top:calc(var(--header-h) + 12px);left:16px;right:16px;z-index:1000;pointer-events:none}
+.toast{
+  background:var(--card2);border-left:4px solid var(--yellow);
+  border-radius:12px;padding:14px 18px;margin-bottom:8px;
+  font-size:15px;font-weight:600;
+  transform:translateY(-20px);opacity:0;transition:all .25s;
+  display:flex;align-items:center;gap:10px;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-left-color:var(--success)}
+.toast.error{border-left-color:var(--danger)}
+.toast svg{width:20px;height:20px;flex-shrink:0}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--yellow-border);border-radius:4px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ═══ -->
+<header class="app-header">
+  <div class="header-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    TradeOS
+  </div>
+  <div class="header-badge"><span class="offline-dot"></span>Field Agent</div>
+</header>
+
+<!-- ═══════════════════════════════════════ MAIN ═══ -->
+<main class="main-content">
+
+  <!-- ─── TAB 1: CHECK-IN ─── -->
+  <section class="tab-section active" id="tab-checkin">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Job Check-In
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Your Name</label>
+      <select id="ci-crew">
+        <option value="">— Select Crew Member —</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Active Job</label>
+      <select id="ci-job">
+        <option value="">— Select Job —</option>
+      </select>
+    </div>
+
+    <label class="field-label" style="margin-bottom:10px">Select Phase</label>
+    <div class="phase-grid" id="phaseGrid">
+      <div class="phase-tile" data-phase="Rough-In" onclick="selectPhase(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
+        <span>Rough-In</span>
+      </div>
+      <div class="phase-tile" data-phase="Trim-Out" onclick="selectPhase(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Trim-Out</span>
+      </div>
+      <div class="phase-tile" data-phase="Inspection" onclick="selectPhase(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Inspection</span>
+      </div>
+      <div class="phase-tile" data-phase="Service Entry" onclick="selectPhase(this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>Service Entry</span>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="submitCheckin()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Log Check-In
+    </button>
+
+    <div class="log-heading">Recent Check-Ins</div>
+    <div id="checkinLog"></div>
+  </section>
+
+  <!-- ─── TAB 2: PHOTOS ─── -->
+  <section class="tab-section" id="tab-photos">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      Job Photos
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Attach To Job</label>
+      <select id="ph-job">
+        <option value="">— Select Job —</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Phase</label>
+      <select id="ph-phase">
+        <option value="">— Select Phase —</option>
+        <option>Rough-In</option>
+        <option>Trim-Out</option>
+        <option>Inspection</option>
+        <option>Service Entry</option>
+        <option>General / Other</option>
+      </select>
+    </div>
+
+    <div class="camera-hero" onclick="triggerCamera('main')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <div class="camera-hero-text">Tap to Take Photo</div>
+      <div class="camera-hero-sub">Opens camera — attach to selected job</div>
+    </div>
+
+    <div id="uploadIndicator" style="display:none">
+      <div class="upload-indicator">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+        <span id="uploadCount">0 photos queued for upload</span>
+      </div>
+    </div>
+
+    <div class="log-heading">Photos This Session</div>
+    <div class="photo-grid" id="photoGrid"></div>
+    <div id="photoEmpty" class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      No photos yet — tap the camera above
+    </div>
+  </section>
+
+  <!-- ─── TAB 3: MATERIAL SHORTAGE ─── -->
+  <section class="tab-section" id="tab-materials">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Material Shortage
+    </div>
+
+    <div style="background:var(--yellow-dim);border:1px solid var(--yellow-border);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:14px;color:var(--yellow)">
+      ⚡ Alert goes to <strong>Austin</strong> (Foreman)
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Job Site</label>
+      <select id="mat-job">
+        <option value="">— Select Job —</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Item Needed</label>
+      <input type="text" id="mat-item" placeholder="e.g. 12/2 Romex wire, 100A breaker…" autocomplete="off">
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field-group">
+        <label class="field-label">Quantity</label>
+        <input type="number" id="mat-qty" placeholder="0" min="1" style="text-align:center;font-size:22px;font-weight:800">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Unit</label>
+        <select id="mat-unit">
+          <option>ft</option>
+          <option>pcs</option>
+          <option>box</option>
+          <option>roll</option>
+          <option>bag</option>
+          <option>each</option>
+          <option>lbs</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Where to Get It</label>
+      <input type="text" id="mat-source" placeholder="e.g. Graybar, Home Depot, supply house…" autocomplete="off">
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Notes (optional)</label>
+      <textarea id="mat-notes" placeholder="Part number, urgency, who needs it…" style="min-height:80px"></textarea>
+    </div>
+
+    <button class="btn btn-danger" onclick="submitMaterial()" style="background:#C0392B">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Send Alert to Foreman
+    </button>
+
+    <div class="log-heading">Shortage Alerts Sent</div>
+    <div id="materialLog"></div>
+  </section>
+
+  <!-- ─── TAB 4: END OF DAY SIGN-OFF ─── -->
+  <section class="tab-section" id="tab-signoff">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      End of Day Sign-Off
+    </div>
+
+    <div style="background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+      <svg style="width:22px;height:22px;color:var(--yellow);flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <div>
+        <div style="font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Today</div>
+        <div style="font-size:18px;font-weight:800" id="signoffDate"></div>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Your Name</label>
+      <select id="so-crew">
+        <option value="">— Select Your Name —</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Job Worked</label>
+      <select id="so-job">
+        <option value="">— Select Job —</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Hours Worked</label>
+      <div class="hours-stepper">
+        <button class="step-btn" onclick="adjustHours(-0.5)">−</button>
+        <div class="step-display" id="hoursDisplay">8.0</div>
+        <button class="step-btn" onclick="adjustHours(0.5)">+</button>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Phase / Work Done Today</label>
+      <select id="so-phase">
+        <option value="">— Select Phase —</option>
+        <option>Rough-In</option>
+        <option>Trim-Out</option>
+        <option>Inspection</option>
+        <option>Service Entry</option>
+        <option>Multiple / Mixed</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Notes for Foreman</label>
+      <textarea id="so-notes" placeholder="What got done, what's left, any issues…"></textarea>
+    </div>
+
+    <button class="btn btn-primary" onclick="submitSignoff()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Submit Sign-Off
+    </button>
+
+    <div class="log-heading">Previous Sign-Offs</div>
+    <div id="signoffLog"></div>
+  </section>
+
+  <!-- ─── TAB 5: INSPECTION LOG ─── -->
+  <section class="tab-section" id="tab-inspection">
+    <div class="section-title">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Inspection Log
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Job Site</label>
+      <select id="ins-job">
+        <option value="">— Select Job —</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Inspection Type</label>
+      <select id="ins-type">
+        <option value="">— Select Type —</option>
+        <option>Rough-In Electrical</option>
+        <option>Service Entry</option>
+        <option>Panel / Load Center</option>
+        <option>Low Voltage / Data</option>
+        <option>Final Electrical</option>
+        <option>Underground Conduit</option>
+        <option>Meter Base</option>
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Inspector Name (optional)</label>
+      <input type="text" id="ins-inspector" placeholder="e.g. City inspector name…" autocomplete="off">
+    </div>
+
+    <label class="field-label">Result</label>
+    <div class="verdict-row">
+      <button class="verdict-btn pass" id="verdictPass" onclick="selectVerdict('PASS')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        PASS
+      </button>
+      <button class="verdict-btn fail" id="verdictFail" onclick="selectVerdict('FAIL')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        FAIL
+      </button>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Notes / Corrections Required</label>
+      <textarea id="ins-notes" placeholder="Inspector comments, corrections needed, re-inspect date…"></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Attach Photo</label>
+      <button class="btn btn-secondary btn-sm" onclick="triggerCamera('inspection')" style="width:auto;margin:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        Take / Attach Photo
+      </button>
+      <div id="insPhotoPreview" style="margin-top:10px;display:none">
+        <img id="insPhotoImg" style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;border:2px solid var(--yellow-border)" alt="Inspection photo">
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="submitInspection()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/></svg>
+      Log Inspection
+    </button>
+
+    <div class="log-heading">Inspection History</div>
+    <div id="inspectionLog"></div>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════ BOTTOM NAV ═══ -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-tab="checkin" onclick="switchTab('checkin',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    <span>Check In</span>
+  </button>
+  <button class="nav-btn" data-tab="photos" onclick="switchTab('photos',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    <span>Photos</span>
+  </button>
+  <button class="nav-btn" data-tab="materials" onclick="switchTab('materials',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    <span>Shortage</span>
+  </button>
+  <button class="nav-btn" data-tab="signoff" onclick="switchTab('signoff',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span>Sign Off</span>
+  </button>
+  <button class="nav-btn" data-tab="inspection" onclick="switchTab('inspection',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span>Inspect</span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════════════ TOAST ═══ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- hidden camera inputs -->
+<input type="file" id="cameraMain" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event,'main')">
+<input type="file" id="cameraInspection" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event,'inspection')">
+
+<script>
+'use strict';
+
+// ═══════════════════ DEFAULTS ═══════════════════
+const DEFAULT_CREW = ['Austin (Foreman)','Jake','Marcus','Tyler','Derek','Kyle','Brandon','Sam','Chris'];
+const DEFAULT_JOBS = [
+  {id:1, name:'Riverside Commons', address:'123 Riverside Dr'},
+  {id:2, name:'Highland Park Office', address:'456 Highland Ave'},
+  {id:3, name:'Westside Warehouse', address:'789 West Blvd'},
+  {id:4, name:'Downtown Retrofit', address:'321 Main St'},
+  {id:5, name:'Northside Residential', address:'55 Oak Lane'},
+];
+
+// ═══════════════════ STATE ═══════════════════
+let selectedPhase = null;
+let selectedVerdict = null;
+let currentHours = 8.0;
+let inspectionPhotoData = null;
+let pendingUploadCount = 0;
+
+// ═══════════════════ STORAGE HELPERS ═══════════════════
+function load(key, fallback=[]) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+}
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) { console.warn('Storage full',e); } }
+function ts() { return Date.now(); }
+function fmtTime(ms) {
+  const d = new Date(ms);
+  return d.toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
+}
+function today() {
+  return new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+}
+
+// ═══════════════════ POPULATE SELECTS ═══════════════════
+function populateSelects() {
+  const crew = load('crew', DEFAULT_CREW);
+  const jobs = load('jobs', DEFAULT_JOBS);
+
+  const crewSelects = ['ci-crew','so-crew'];
+  const jobSelects  = ['ci-job','ph-job','mat-job','so-job','ins-job'];
+
+  crewSelects.forEach(id => {
+    const el = document.getElementById(id); if(!el) return;
+    el.innerHTML = '<option value="">— Select Crew Member —</option>';
+    crew.forEach(n => el.insertAdjacentHTML('beforeend',`<option>${n}</option>`));
+  });
+
+  jobSelects.forEach(id => {
+    const el = document.getElementById(id); if(!el) return;
+    el.innerHTML = '<option value="">— Select Job —</option>';
+    jobs.forEach(j => el.insertAdjacentHTML('beforeend',`<option value="${j.id}">${j.name}</option>`));
+  });
+}
+
+function jobName(id) {
+  const jobs = load('jobs', DEFAULT_JOBS);
+  const j = jobs.find(x => String(x.id) === String(id));
+  return j ? j.name : id;
+}
+
+// ═══════════════════ TAB NAVIGATION ═══════════════════
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  // scroll to top of new tab
+  document.getElementById('tab-'+name).scrollTop = 0;
+}
+
+// ═══════════════════ PHASE SELECTOR ═══════════════════
+function selectPhase(tile) {
+  document.querySelectorAll('.phase-tile').forEach(t => t.classList.remove('selected'));
+  tile.classList.add('selected');
+  selectedPhase = tile.dataset.phase;
+}
+
+// ═══════════════════ CHECK-IN ═══════════════════
+function submitCheckin() {
+  const crew = document.getElementById('ci-crew').value;
+  const jobId = document.getElementById('ci-job').value;
+  if (!crew) { toast('Select your name first', 'error'); return; }
+  if (!jobId) { toast('Select a job first', 'error'); return; }
+  if (!selectedPhase) { toast('Select a phase', 'error'); return; }
+
+  const record = { id: ts(), crew, jobId, job: jobName(jobId), phase: selectedPhase, time: ts() };
+  const log = load('checkins');
+  log.unshift(record);
+  save('checkins', log.slice(0, 50));
+
+  toast(`✓ Checked in — ${selectedPhase} @ ${jobName(jobId)}`, 'success');
+  renderCheckinLog();
+
+  // reset phase
+  document.querySelectorAll('.phase-tile').forEach(t => t.classList.remove('selected'));
+  selectedPhase = null;
+}
+
+function renderCheckinLog() {
+  const log = load('checkins');
+  const el = document.getElementById('checkinLog');
+  if (!log.length) {
+    el.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>No check-ins yet today</div>';
+    return;
+  }
+  el.innerHTML = log.slice(0,8).map(r => `
+    <div class="log-card">
+      <div class="log-card-title">${escHtml(r.crew)}</div>
+      <div class="log-card-sub">${escHtml(r.job)}</div>
+      <span class="log-card-badge badge-yellow">${escHtml(r.phase)}</span>
+      <span class="log-card-badge badge-blue" style="margin-left:4px">${fmtTime(r.time)}</span>
+    </div>`).join('');
+}
+
+// ═══════════════════ PHOTOS ═══════════════════
+function triggerCamera(ctx) {
+  if (ctx === 'inspection') {
+    document.getElementById('cameraInspection').click();
+  } else {
+    const jobId = document.getElementById('ph-job').value;
+    const phase = document.getElementById('ph-phase').value;
+    if (!jobId) { toast('Select a job before taking a photo', 'error'); return; }
+    if (!phase) { toast('Select a phase before taking a photo', 'error'); return; }
+    document.getElementById('cameraMain').click();
+  }
+}
+
+function handlePhoto(event, ctx) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    if (ctx === 'inspection') {
+      inspectionPhotoData = dataUrl;
+      document.getElementById('insPhotoImg').src = dataUrl;
+      document.getElementById('insPhotoPreview').style.display = 'block';
+      toast('Photo attached to inspection', 'success');
+    } else {
+      const jobId = document.getElementById('ph-job').value;
+      const phase = document.getElementById('ph-phase').value;
+      const photos = load('photos');
+      const record = { id: ts(), jobId, job: jobName(jobId), phase, dataUrl, time: ts(), uploaded: false };
+      photos.unshift(record);
+      save('photos', photos.slice(0, 30)); // limit storage
+      pendingUploadCount = photos.filter(p => !p.uploaded).length;
+      updateUploadIndicator();
+      renderPhotoGrid();
+      toast(`Photo saved — ${jobName(jobId)} / ${phase}`, 'success');
+    }
+    // reset input so same file can be re-selected
+    event.target.value = '';
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateUploadIndicator() {
+  const ind = document.getElementById('uploadIndicator');
+  const cnt = document.getElementById('uploadCount');
+  const photos = load('photos');
+  const pending = photos.filter(p => !p.uploaded).length;
+  if (pending > 0) {
+    ind.style.display = 'block';
+    cnt.textContent = `${pending} photo${pending !== 1 ? 's' : ''} queued for upload`;
+  } else {
+    ind.style.display = 'none';
+  }
+}
+
+function renderPhotoGrid() {
+  const photos = load('photos');
+  const grid = document.getElementById('photoGrid');
+  const empty = document.getElementById('photoEmpty');
+  if (!photos.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  grid.innerHTML = photos.slice(0,18).map(p => `
+    <div class="photo-thumb">
+      <img src="${p.dataUrl}" loading="lazy" alt="Job photo">
+      <div class="photo-thumb-badge">${escHtml(p.phase)}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════ MATERIAL SHORTAGE ═══════════════════
+function submitMaterial() {
+  const jobId = document.getElementById('mat-job').value;
+  const item  = document.getElementById('mat-item').value.trim();
+  const qty   = document.getElementById('mat-qty').value;
+  const unit  = document.getElementById('mat-unit').value;
+  const src   = document.getElementById('mat-source').value.trim();
+  const notes = document.getElementById('mat-notes').value.trim();
+
+  if (!jobId) { toast('Select a job', 'error'); return; }
+  if (!item)  { toast('Enter the item needed', 'error'); return; }
+  if (!qty)   { toast('Enter a quantity', 'error'); return; }
+
+  const record = { id: ts(), jobId, job: jobName(jobId), item, qty, unit, src, notes, time: ts() };
+  const log = load('materials');
+  log.unshift(record);
+  save('materials', log.slice(0, 50));
+
+  toast(`🚨 Alert sent to Austin — ${item}`, 'success');
+
+  // clear form
+  document.getElementById('mat-item').value = '';
+  document.getElementById('mat-qty').value = '';
+  document.getElementById('mat-source').value = '';
+  document.getElementById('mat-notes').value = '';
+  renderMaterialLog();
+}
+
+function renderMaterialLog() {
+  const log = load('materials');
+  const el  = document.getElementById('materialLog');
+  if (!log.length) {
+    el.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>No shortage alerts sent yet</div>';
+    return;
+  }
+  el.innerHTML = log.slice(0,10).map(r => `
+    <div class="log-card" style="border-left-color:var(--danger)">
+      <div class="log-card-title">${escHtml(r.item)}</div>
+      <div class="log-card-sub">${escHtml(r.job)}${r.src ? ' · '+escHtml(r.src) : ''}</div>
+      <span class="log-card-badge badge-red">${escHtml(r.qty)} ${escHtml(r.unit)}</span>
+      <span class="log-card-badge badge-blue" style="margin-left:4px">${fmtTime(r.time)}</span>
+      ${r.notes ? `<div style="font-size:13px;color:var(--muted);margin-top:6px">${escHtml(r.notes)}</div>` : ''}
+    </div>`).join('');
+}
+
+// ═══════════════════ HOURS STEPPER ═══════════════════
+function adjustHours(delta) {
+  currentHours = Math.max(0, Math.min(24, currentHours + delta));
+  document.getElementById('hoursDisplay').textContent = currentHours.toFixed(1);
+}
+
+// ═══════════════════ SIGN-OFF ═══════════════════
+function submitSignoff() {
+  const crew  = document.getElementById('so-crew').value;
+  const jobId = document.getElementById('so-job').value;
+  const phase = document.getElementById('so-phase').value;
+  const notes = document.getElementById('so-notes').value.trim();
+
+  if (!crew)  { toast('Select your name', 'error'); return; }
+  if (!jobId) { toast('Select the job you worked', 'error'); return; }
+  if (!phase) { toast('Select phase worked today', 'error'); return; }
+
+  const record = { id: ts(), crew, jobId, job: jobName(jobId), hours: currentHours, phase, notes, time: ts() };
+  const log = load('signoffs');
+  log.unshift(record);
+  save('signoffs', log.slice(0, 50));
+
+  toast(`✓ Sign-off submitted — ${currentHours}h on ${jobName(jobId)}`, 'success');
+
+  document.getElementById('so-notes').value = '';
+  currentHours = 8.0;
+  document.getElementById('hoursDisplay').textContent = '8.0';
+  renderSignoffLog();
+}
+
+function renderSignoffLog() {
+  const log = load('signoffs');
+  const el  = document.getElementById('signoffLog');
+  if (!log.length) {
+    el.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>No sign-offs yet</div>';
+    return;
+  }
+  el.innerHTML = log.slice(0,8).map(r => `
+    <div class="log-card" style="border-left-color:var(--success)">
+      <div class="log-card-title">${escHtml(r.crew)}</div>
+      <div class="log-card-sub">${escHtml(r.job)} · ${escHtml(r.phase)}</div>
+      <span class="log-card-badge badge-green">${r.hours}h</span>
+      <span class="log-card-badge badge-blue" style="margin-left:4px">${fmtTime(r.time)}</span>
+      ${r.notes ? `<div style="font-size:13px;color:var(--muted);margin-top:6px">${escHtml(r.notes)}</div>` : ''}
+    </div>`).join('');
+}
+
+// ═══════════════════ INSPECTION ═══════════════════
+function selectVerdict(v) {
+  selectedVerdict = v;
+  document.getElementById('verdictPass').classList.toggle('selected', v === 'PASS');
+  document.getElementById('verdictFail').classList.toggle('selected', v === 'FAIL');
+}
+
+function submitInspection() {
+  const jobId    = document.getElementById('ins-job').value;
+  const type     = document.getElementById('ins-type').value;
+  const inspector= document.getElementById('ins-inspector').value.trim();
+  const notes    = document.getElementById('ins-notes').value.trim();
+
+  if (!jobId)         { toast('Select a job', 'error'); return; }
+  if (!type)          { toast('Select inspection type', 'error'); return; }
+  if (!selectedVerdict){ toast('Select PASS or FAIL', 'error'); return; }
+
+  const record = {
+    id: ts(), jobId, job: jobName(jobId), type, inspector,
+    verdict: selectedVerdict, notes,
+    photo: inspectionPhotoData || null,
+    time: ts()
+  };
+  const log = load('inspections');
+  log.unshift(record);
+  save('inspections', log.slice(0, 100));
+
+  toast(`${selectedVerdict === 'PASS' ? '✓' : '✗'} Inspection logged — ${selectedVerdict}`, selectedVerdict === 'PASS' ? 'success' : 'error');
+
+  // reset
+  document.getElementById('ins-inspector').value = '';
+  document.getElementById('ins-notes').value = '';
+  document.getElementById('insPhotoPreview').style.display = 'none';
+  document.getElementById('verdictPass').classList.remove('selected');
+  document.getElementById('verdictFail').classList.remove('selected');
+  selectedVerdict = null;
+  inspectionPhotoData = null;
+  renderInspectionLog();
+}
+
+function renderInspectionLog() {
+  const log = load('inspections');
+  const el  = document.getElementById('inspectionLog');
+  if (!log.length) {
+    el.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>No inspections logged yet</div>';
+    return;
+  }
+  el.innerHTML = log.slice(0,15).map(r => `
+    <div class="log-card" style="border-left-color:${r.verdict==='PASS'?'var(--success)':'var(--danger)'}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="log-card-title">${escHtml(r.type)}</div>
+          <div class="log-card-sub">${escHtml(r.job)}${r.inspector?' · '+escHtml(r.inspector):''}</div>
+        </div>
+        <span class="log-card-badge ${r.verdict==='PASS'?'badge-green':'badge-red'}" style="flex-shrink:0;margin-left:8px">${r.verdict}</span>
+      </div>
+      <div style="margin-top:4px"><span class="log-card-badge badge-blue">${fmtTime(r.time)}</span></div>
+      ${r.notes ? `<div style="font-size:13px;color:var(--muted);margin-top:6px">${escHtml(r.notes)}</div>` : ''}
+      ${r.photo ? `<img src="${r.photo}" style="width:100%;max-height:150px;object-fit:cover;border-radius:8px;margin-top:8px" loading="lazy" alt="Inspection photo">` : ''}
+    </div>`).join('');
+}
+
+// ═══════════════════ TOAST ═══════════════════
+function toast(msg, type='info') {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+
+  const icon = type === 'success'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>'
+    : type === 'error'
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+
+  el.innerHTML = icon + escHtml(msg);
+  container.appendChild(el);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => el.classList.add('show'));
+  });
+
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
+}
+
+// ═══════════════════ UTILS ═══════════════════
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════ INIT ═══════════════════
+function init() {
+  // seed defaults if first run
+  if (!localStorage.getItem('crew'))  save('crew', DEFAULT_CREW);
+  if (!localStorage.getItem('jobs'))  save('jobs', DEFAULT_JOBS);
+
+  populateSelects();
+  document.getElementById('signoffDate').textContent = today();
+
+  renderCheckinLog();
+  renderPhotoGrid();
+  updateUploadIndicator();
+  renderMaterialLog();
+  renderSignoffLog();
+  renderInspectionLog();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
