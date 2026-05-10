@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeOS — Electrical Operations</title>
+<style>
+  :root {
+    --bg: #1A1A2E;
+    --surface: #16213E;
+    --surface2: #0F3460;
+    --yellow: #F5C518;
+    --yellow-dim: #C49A10;
+    --white: #FFFFFF;
+    --gray: #8B8B9E;
+    --red: #E63946;
+    --green: #4CAF50;
+    --orange: #FF8C42;
+    --border: #2A2A4E;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--yellow);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--yellow);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--yellow);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .date-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--gray);
+  }
+
+  .date-badge span {
+    color: var(--yellow);
+    font-weight: 600;
+  }
+
+  .crew-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--gray);
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  /* NAV TABS */
+  .nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+
+  .nav-tab {
+    padding: 14px 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: var(--gray);
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .nav-tab:hover { color: var(--white); }
+
+  .nav-tab.active {
+    color: var(--yellow);
+    border-bottom-color: var(--yellow);
+  }
+
+  .nav-badge {
+    background: var(--red);
+    color: var(--white);
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* MAIN CONTENT */
+  .main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* SECTION HEADERS */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--white);
+  }
+
+  .section-sub {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+
+  .btn {
+    background: var(--yellow);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+  }
+
+  .btn:hover { background: var(--yellow-dim); }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+  }
+
+  .card-sub {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 3px;
+  }
+
+  /* PHASE BADGE */
+  .phase-badge {
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .phase-rough { background: #2D3561; color: #7B9CFF; }
+  .phase-trim { background: #2D4A35; color: #5CDE7A; }
+  .phase-inspection { background: #4A2D2D; color: #FF7B7B; }
+  .phase-service { background: #3D2D4A; color: #C07BFF; }
+  .phase-complete { background: #2D3F2D; color: var(--green); }
+
+  /* CREW PILLS */
+  .crew-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .crew-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .crew-initials {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--yellow);
+    color: #000;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* GRID LAYOUTS */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* STAT CARDS */
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--yellow);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* TIMELINE */
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .day-col {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .day-header {
+    background: var(--surface2);
+    padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .day-header.today {
+    background: var(--yellow);
+    color: #000;
+  }
+
+  .day-item {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+  }
+
+  .day-item:last-child { border-bottom: none; }
+
+  .day-item-title {
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 2px;
+  }
+
+  .day-item-detail {
+    color: var(--gray);
+    font-size: 10px;
+  }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--yellow);
+    transition: width 0.3s;
+  }
+
+  .progress-fill.green { background: var(--green); }
+  .progress-fill.red { background: var(--red); }
+  .progress-fill.orange { background: var(--orange); }
+
+  /* MARGIN INDICATOR */
+  .margin-badge {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .margin-good { background: rgba(76,175,80,0.15); color: var(--green); }
+  .margin-warn { background: rgba(255,140,66,0.15); color: var(--orange); }
+  .margin-bad { background: rgba(230,57,70,0.15); color: var(--red); }
+
+  /* TABLE */
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .table th {
+    text-align: left;
+    padding: 10px 14px;
+    color: var(--gray);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .table tr:last-child td { border-bottom: none; }
+
+  .table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* INVOICE */
+  .days-badge {
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .days-ok { background: rgba(76,175,80,0.15); color: var(--green); }
+  .days-warn { background: rgba(255,140,66,0.15); color: var(--orange); }
+  .days-late { background: rgba(230,57,70,0.15); color: var(--red); }
+
+  /* CHECKLIST */
+  .checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+
+  .checklist-item:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.15s;
+  }
+
+  .check-box.checked {
+    background: var(--green);
+    border-color: var(--green);
+  }
+
+  .check-box.ordered {
+    background: var(--orange);
+    border-color: var(--orange);
+  }
+
+  .checklist-text {
+    flex: 1;
+  }
+
+  .checklist-label {
+    font-size: 13px;
+    color: var(--white);
+  }
+
+  .checklist-sub {
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 1px;
+  }
+
+  .status-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.3px;
+  }
+
+  .status-onsite { background: rgba(76,175,80,0.2); color: var(--green); }
+  .status-ordered { background: rgba(255,140,66,0.2); color: var(--orange); }
+  .status-needed { background: rgba(230,57,70,0.2); color: var(--red); }
+
+  /* ALERT BANNER */
+  .alert {
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .alert-warn {
+    background: rgba(255,140,66,0.1);
+    border: 1px solid rgba(255,140,66,0.3);
+    color: var(--orange);
+  }
+
+  .alert-red {
+    background: rgba(230,57,70,0.1);
+    border: 1px solid rgba(230,57,70,0.3);
+    color: var(--red);
+  }
+
+  /* JOB ROW */
+  .job-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .job-row:last-child { border-bottom: none; }
+  .job-row:hover { background: rgba(255,255,255,0.02); }
+
+  .job-row-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  @media (max-width: 768px) {
+    .job-row, .job-row-header {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--gray);
+  }
+
+  .empty-icon { font-size: 36px; margin-bottom: 8px; }
+  .empty-text { font-size: 14px; }
+
+  /* FOLLOW UP BUTTON */
+  .follow-btn {
+    background: none;
+    border: 1px solid var(--yellow);
+    color: var(--yellow);
+    border-radius: 4px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .follow-btn:hover { background: rgba(245,197,24,0.1); }
+
+  .follow-btn.sent {
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  /* MILESTONE TAG */
+  .milestone {
+    font-size: 11px;
+    color: var(--yellow);
+    font-weight: 600;
+  }
+
+  /* SCROLLABLE TABLE WRAPPER */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    overflow-x: auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">TRADE<span style="color:#fff;font-weight:300">OS</span></div>
+  </div>
+  <div class="header-right">
+    <div class="crew-status">
+      <div class="dot"></div>
+      4 crew active
+    </div>
+    <div class="date-badge">Week of <span>May 11, 2026</span></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="nav-tab active" onclick="showTab('dashboard')">
+    📋 Monday Brief
+  </div>
+  <div class="nav-tab" onclick="showTab('jobs')">
+    🏗️ Job Board
+  </div>
+  <div class="nav-tab" onclick="showTab('materials')">
+    📦 Material Pulls
+    <span class="nav-badge">3</span>
+  </div>
+  <div class="nav-tab" onclick="showTab('invoices')">
+    💰 Invoices
+    <span class="nav-badge">2</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ========== DASHBOARD ========== -->
+  <div id="tab-dashboard" class="tab-content active">
+
+    <div class="section-header">
+      <div>
+        <div class="section-title">Monday Morning Brief</div>
+        <div class="section-sub">Week of May 11 — 4 jobs active, 6 crew-days scheduled</div>
+      </div>
+    </div>
+
+    <!-- ALERTS -->
+    <div class="alert alert-red">
+      ⚠️ Skyline Office — Rough-in inspection TOMORROW (Tue May 12). Mike + Derek on site by 7am.
+    </div>
+    <div class="alert alert-warn">
+      ⚡ Ranch House Café — Panel schedule still pending from GC. Follow up before EOD.
+    </div>
+
+    <!-- WEEKLY VIEW -->
+    <div class="week-grid">
+      <div class="day-col">
+        <div class="day-header today">MON 5/11</div>
+        <div class="day-item">
+          <div class="day-item-title">Skyline Office</div>
+          <div class="day-item-detail">Mike + Derek — rough-in walls</div>
+        </div>
+        <div class="day-item">
+          <div class="day-item-title">Ranch House Café</div>
+          <div class="day-item-detail">Austin + Jose — service entry</div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="day-header">TUE 5/12</div>
+        <div class="day-item">
+          <div class="day-item-title">Skyline Office</div>
+          <div class="day-item-detail">INSPECTION 8am — all 4 crew</div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="day-header">WED 5/13</div>
+        <div class="day-item">
+          <div class="day-item-title">Ranch House Café</div>
+          <div class="day-item-detail">Mike + Derek — panel set</div>
+        </div>
+        <div class="day-item">
+          <div class="day-item-title">Pinnacle Suites</div>
+          <div class="day-item-detail">Austin + Jose — trim-out start</div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="day-header">THU 5/14</div>
+        <div class="day-item">
+          <div class="day-item-title">Pinnacle Suites</div>
+          <div class="day-item-detail">Mike + Derek — device install</div>
+        </div>
+        <div class="day-item">
+          <div class="day-item-title">Ranch House Café</div>
+          <div class="day-item-detail">Austin — GC walkthrough 2pm</div>
+        </div>
+      </div>
+      <div class="day-col">
+        <div class="day-header">FRI 5/15</div>
+        <div class="day-item">
+          <div class="day-item-title">Skyline Office</div>
+          <div class="day-item-detail">Jose — device install</div>
+        </div>
+        <div class="day-item">
+          <div class="day-item-title">Pinnacle Suites</div>
+          <div class="day-item-detail">Mike + Derek — finish out</div>
+        </div>
+        <div class="day-item">
+          <div class="day-item-title">Morrison Warehouse</div>
+          <div class="day-item-detail">Austin — site walk 10am</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOB SUMMARY CARDS -->
+    <div class="section-header" style="margin-top:8px;">
+      <div class="section-title" style="font-size:15px;">Active Jobs This Week</div>
+    </div>
+
+    <div class="grid-2">
+
+      <!-- Job Card -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Skyline Office Buildout</div>
+            <div class="card-sub">GC: Hernandez Construction · Plano, TX</div>
+          </div>
+          <div class="phase-badge phase-rough">ROUGH-IN</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+          <div style="font-size:12px; color:var(--gray);">Inspection: <span style="color:var(--red); font-weight:700;">Tue May 12</span></div>
+          <div style="font-size:12px; color:var(--gray);">Contract: <span style="color:var(--white);">$48,500</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:45%"></div></div>
+        <div style="font-size:10px; color:var(--gray); margin-top:4px;">45% complete</div>
+        <div class="crew-list">
+          <div class="crew-pill"><div class="crew-initials">AK</div> Austin</div>
+          <div class="crew-pill"><div class="crew-initials">MR</div> Mike</div>
+          <div class="crew-pill"><div class="crew-initials">DC</div> Derek</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Ranch House Café</div>
+            <div class="card-sub">GC: Southwest Builders · Frisco, TX</div>
+          </div>
+          <div class="phase-badge phase-service">SERVICE</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+          <div style="font-size:12px; color:var(--gray);">Deadline: <span style="color:var(--orange); font-weight:700;">May 22</span></div>
+          <div style="font-size:12px; color:var(--gray);">Contract: <span style="color:var(--white);">$31,200</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill orange" style="width:30%"></div></div>
+        <div style="font-size:10px; color:var(--gray); margin-top:4px;">30% complete</div>
+        <div class="crew-list">
+          <div class="crew-pill"><div class="crew-initials">AK</div> Austin</div>
+          <div class="crew-pill"><div class="crew-initials">JL</div> Jose</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Pinnacle Suites — Phase 2</div>
+            <div class="card-sub">GC: DFW Commercial Group · Allen, TX</div>
+          </div>
+          <div class="phase-badge phase-trim">TRIM-OUT</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+          <div style="font-size:12px; color:var(--gray);">Deadline: <span style="color:var(--white); font-weight:700;">May 29</span></div>
+          <div style="font-size:12px; color:var(--gray);">Contract: <span style="color:var(--white);">$67,000</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill green" style="width:72%"></div></div>
+        <div style="font-size:10px; color:var(--gray); margin-top:4px;">72% complete</div>
+        <div class="crew-list">
+          <div class="crew-pill"><div class="crew-initials">MR</div> Mike</div>
+          <div class="crew-pill"><div class="crew-initials">DC</div> Derek</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Morrison Cold Storage</div>
+            <div class="card-sub">GC: Lone Star Industrial · Garland, TX</div>
+          </div>
+          <div class="phase-badge phase-inspection">INSPECTION</div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px;">
+          <div style="font-size:12px; color:var(--gray);">Site walk: <span style="color:var(--white); font-weight:700;">Fri May 15</span></div>
+          <div style="font-size:12px; color:var(--gray);">Contract: <span style="color:var(--white);">$22,800</span></div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill green" style="width:90%"></div></div>
+        <div style="font-size:10px; color:var(--gray); margin-top:4px;">90% complete — final walkthrough pending</div>
+        <div class="crew-list">
+          <div class="crew-pill"><div class="crew-initials">AK</div> Austin</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- QUICK STATS -->
+    <div class="section-header" style="margin-top:20px;">
+      <div class="section-title" style="font-size:15px;">Week at a Glance</div>
+    </div>
+    <div class="grid-3">
+      <div class="stat-card">
+        <div class="stat-value">$169K</div>
+        <div class="stat-label">Open Contract Value</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--red);">$34K</div>
+        <div class="stat-label">Outstanding Invoices</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--green);">41%</div>
+        <div class="stat-label">Avg Gross Margin</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== JOB BOARD ========== -->
+  <div id="tab-jobs" class="tab-content">
+
+    <div class="section-header">
+      <div>
+        <div class="section-title">Job Board</div>
+        <div class="section-sub">4 active jobs · $169,500 total contract value</div>
+      </div>
+      <button class="btn">+ New Job</button>
+    </div>
+
+    <div class="table-wrap">
+      <div class="job-row-header">
+        <div>Job / GC</div>
+        <div>Phase</div>
+        <div>Crew</div>
+        <div>Next Milestone</div>
+        <div>Margin</div>
+        <div>Status</div>
+      </div>
+
+      <!-- Job 1 -->
+      <div class="job-row">
+        <div>
+          <div style="font-weight:700;">Skyline Office Buildout</div>
+          <div style="font-size:11px; color:var(--gray);">Hernandez Construction · Plano</div>
+        </div>
+        <div><span class="phase-badge phase-rough">ROUGH-IN</span></div>
+        <div>
+          <div style="font-size:12px;">AK · MR · DC</div>
+          <div style="font-size:10px; color:var(--gray);">3 of 4 crew</div>
+        </div>
+        <div>
+          <div class="milestone">⚠ Inspection Tue 5/12</div>
+          <div style="font-size:10px; color:var(--gray);">City of Plano — rough-in</div>
+        </div>
+        <div><span class="margin-badge margin-good">38%</span></div>
+        <div>
+          <div class="progress-bar" style="width:60px; display:inline-block;">
+            <div class="progress-fill" style="width:45%;"></div>
+          </div>
+          <div style="font-size:10px; color:var(--gray); margin-top:3px;">45%</div>
+        </div>
+      </div>
+
+      <!-- Job 2 -->
+      <div class="job-row">
+        <div>
+          <div style="font-weight:700;">Ranch House Café</div>
+          <div style="font-size:11px; color:var(--gray);">Southwest Builders · Frisco</div>
+        </div>
+        <div><span class="phase-badge phase-service">SERVICE ENTRY</span></div>
+        <div>
+          <div style="font-size:12px;">AK · JL</div>
+          <div style="font-size:10px; color:var(--gray);">2 of 4 crew</div>
+        </div>
+        <div>
+          <div class="milestone">Panel set Wed 5/13</div>
+          <div style="font-size:10px; color:var(--gray);">400A 3-phase service</div>
+        </div>
+        <div><span class="margin-badge margin-warn">29%</span></div>
+        <div>
+          <div class="progress-bar" style="width:60px; display:inline-block;">
+            <div class="progress-fill orange" style="width:30%;"></div>
+          </div>
+          <div style="font-size:10px; color:var(--gray); margin-top:3px;">30%</div>
+        </div>
+      </div>
+
+      <!-- Job 3 -->
+      <div class="job-row">
+        <div>
+          <div style="font-weight:700;">Pinnacle Suites — Phase 2</div>
+          <div style="font-size:11px; color:var(--gray);">DFW Commercial Group · Allen</div>
+        </div>
+        <div><span class="phase-badge phase-trim">TRIM-OUT</span></div>
+        <div>
+          <div style="font-size:12px;">MR · DC</div>
+          <div style="font-size:10px; color:var(--gray);">2 of 4 crew</div>
+        </div>
+        <div>
+          <div class="milestone">Final walkthrough May 29</div>
+          <div style="font-size:10px; color:var(--gray);">Device install + fixture hang</div>
+        </div>
+        <div><span class="margin-badge margin-good">47%</span></div>
+        <div>
+          <div class="progress-bar" style="width:60px; display:inline-block;">
+            <div class="progress-fill green" style="width:72%;"></div>
+          </div>
+          <div style="font-size:10px; color:var(--gray); margin-top:3px;">72%</div>
+        </div>
+      </div>
+
+      <!-- Job 4 -->
+      <div class="job-row">
+        <div>
+          <div style="font-weight:700;">Morrison Cold Storage</div>
+          <div style="font-size:11px; color:var(--gray);">Lone Star Industrial · Garland</div>
+        </div>
+        <div><span class="phase-badge phase-inspection">FINAL INSP.</span></div>
+        <div>
+          <div style="font-size:12px;">AK</div>
+          <div style="font-size:10px; color:var(--gray);">1 of 4 crew</div>
+        </div>
+        <div>
+          <div class="milestone">Site walk Fri 5/15</div>
+          <div style="font-size:10px; color:var(--gray);">Certificate of Occupancy</div>
+        </div>
+        <div><span class="margin-badge margin-good">52%</span></div>
+        <div>
+          <div class="progress-bar" style="width:60px; display:inline-block;">
+            <div class="progress-fill green" style="width:90%;"></div>
+          </div>
+          <div style="font-size:10px; color:var(--gray); margin-top:3px;">90%</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PIPELINE -->
+    <div class="section-header" style="margin-top:24px;">
+      <div>
+        <div class="section-title" style="font-size:15px;">Pipeline</div>
+        <div class="section-sub">Upcoming — not yet under contract</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Prospect</th>
+            <th>Type</th>
+            <th>Est. Value</th>
+            <th>Stage</th>
+            <th>Contact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div style="font-weight:600;">Westfield Auto Group</div>
+              <div style="font-size:11px; color:var(--gray);">Lewisville, TX</div>
+            </td>
+            <td style="color:var(--gray);">Commercial tenant finish</td>
+            <td style="color:var(--yellow); font-weight:700;">$85,000</td>
+            <td><span class="phase-badge phase-rough">BID SENT</span></td>
+            <td style="font-size:11px; color:var(--gray);">Rick Morales · (214) 555-0184</td>
+          </tr>
+          <tr>
+            <td>
+              <div style="font-weight:600;">Dallas Youth Center</div>
+              <div style="font-size:11px; color:var(--gray);">Oak Cliff, TX</div>
+            </td>
+            <td style="color:var(--gray);">Service upgrade + reno</td>
+            <td style="color:var(--yellow); font-weight:700;">$42,500</td>
+            <td><span class="phase-badge phase-service">ESTIMATING</span></td>
+            <td style="font-size:11px; color:var(--gray);">Carol Jenkins · (214) 555-0291</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ========== MATERIALS ========== -->
+  <div id="tab-materials" class="tab-content">
+
+    <div class="section-header">
+      <div>
+        <div class="section-title">Material Pull Lists</div>
+        <div class="section-sub">3 items needed before crew leaves today</div>
+      </div>
+    </div>
+
+    <div class="alert alert-red">
+      🚨 3 items NEEDED for today's jobs — confirm before 5:30am
+    </div>
+
+    <!-- Job 1: Skyline -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Skyline Office Buildout</div>
+          <div class="card-sub">Inspection Tue — pull today or delay</div>
+        </div>
+        <div class="phase-badge phase-rough">ROUGH-IN</div>
+      </div>
+
+      <div class="checklist-item" onclick="toggleCheck(this)">
+        <div class="check-box checked">✓</div>
+        <div class="checklist-text">
+          <div class="checklist-label">#12 THHN wire — 500ft coil (black/white/green)</div>
+          <div class="checklist-sub">Home Depot Plano · Order #HD-88221</div>
+        </div>
+        <span class="status-tag status-onsite">ON-SITE</span>
+      </div>
+
+      <div class="checklist-item" onclick="toggleCheck(this)">
+        <div class="check-box checked">✓</div>
+        <div class="checklist-text">
+          <div class="checklist-label">1" EMT conduit — 100x 10ft sticks</div>
+          <div class="checklist-sub">Home Depot Plano · In truck</div>
+        </div>
+        <span class="status-tag status-onsite">ON-SITE</span>
+      </div>
+
+      <div class="checklist-item" onclick="toggleCheck(this)">
+        <div class="check-box ordered">→</div>
+        <div class="checklist-text">
+          <div class="checklist-label">20A duplex receptacles — 48 qty (commercial grade)</div>
+          <div class="checklist-sub">Graybar Electric · Est. delivery Wed 5/13</div>
+        </div>
+        <span class="status-tag status-ordered">ORDERED</span>
+      </div>
+
+      <div class="checklist-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div class="checklist-text">
+          <div class="checklist-label">Square D QO breakers — 20A (12 qty), 30A (4 qty)</div>
+          <div class="checklist-sub">Need to order — required for panel rough-in</div>
+        </div>
+        <span class="status-tag status-needed">NEEDED</span>
+      </div>
+
+      <div class="checklist-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div class="checklist-text">
+          <div class="checklist-label">Metal junction boxes — 4" square, 48 qty</div>
+          <div class="checklist-sub">Check stock at Plano HD first</div>
+        </div>
+        <span class="status-tag status-needed">NEEDED</span>
+      </div>
+    </div>
+
+    <!-- Job 2: Ranch House -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Ranch House Café</div>
+          <div class="card-sub">Panel set Wed — need gear by Tuesday EOD</div>
+        </div>
+        <div class="phase-badge phase-service">SERVICE</div>
+      </div>
+
+      <div class="checklist-item" onclick="toggleCheck(this)">
+        <div class="check-box checked">✓</div>
+        <div class="checklist-text">
+          <div class="checklist-label">400A 3-phase panel — Square D I-Line 42-space</div>
+          <div class="checklist-sub">Rexel Supply Frisco · Will call ready</div>
+        </div>
+        <span class="status-tag status-onsite">ON-SITE</span>
+      </div>
+
+      <div class="checklist-item" onclick="toggleCheck(this)">
+        <div class="check-box ordered">→</div>
+        <div class="checklist-text">
+          <div class="checklist-label">2" rigid conduit — 60ft + fittings</div>
+          <div class="checklist-sub">Rexel · ETA Tuesday 5/12 AM</div>
+        </div>
+        <span class="status-tag status-ordered">ORDERED</span>
+      </div>
+
+      <div class="checklist-item" onclick="toggleCheck(this)">
+        <div class="check-box"></div>
+        <div class="checklist-text">
+          <div class="checklist-label">Service entrance cable — 4/0 aluminum, 100ft</div>
+          <div class="checklist-sub">Call Rexel — need to confirm Oncor drop schedule first</div>
+        </div>
+        <span class="status-tag status-needed">NEEDED</span>
+      </div>
+    </div>
+
+    <!-- Job 3: Pinnacle -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Pinnacle Suites — Phase 2</div>
+          <div class="card-sub">Trim-out this week — mostly stocked</div>
+        </div>
+        <div class="phase-badge phase-trim">TRIM-OUT</div>
+      </div>
+
+      <div class="checklist-item" onclick="toggleCheck(this)">
+        <div class="check-box checked">✓</div>
+        <div class="checklist-text">
+          <div class="checklist-label">Decora switches + dimmers — 85 qty (spec per plan)</div>
+          <div class="checklist-sub">Leviton SmartGrade · In job box</div>
+        </div>
+        <span class="status-tag status-onsite">ON-SITE</span>
+      </div>
+
+      <div class="checklist-item" onclick="toggleCheck(this)">
+        <div class="check-box checked">✓</div>
+        <div class="checklist-text">
+          <div class="checklist-label">LED recessed cans — 6" 90W equiv, 120 units</div>
+          <div class="checklist-sub">Commercial Electric · In job box</div>
+        </div>
+        <span class="status-tag status-onsite">ON-SITE</span>
+      </div>
+
+      <div class="checklist-item" onclick="toggleCheck(this)">
+        <div class="check-box checked">✓</div>
+        <div class="checklist-text">
+          <div class="checklist-label">Cover plates — white Decora, 90 qty</div>
+          <div class="checklist-sub">In job box</div>
+        </div>
+        <span class="status-tag status-onsite">ON-SITE</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== INVOICES ========== -->
+  <div id="tab-invoices" class="tab-content">
+
+    <div class="section-header">
+      <div>
+        <div class="section-title">Invoice Tracker</div>
+        <div class="section-sub">$34,750 outstanding across 4 invoices</div>
+      </div>
+      <button class="btn">+ New Invoice</button>
+    </div>
+
+    <div class="alert alert-red">
+      ⚠️ 2 invoices are 30+ days past due — follow up today
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Invoice</th>
+            <th>Client / Job</th>
+            <th>Amount</th>
+            <th>Sent</th>
+            <th>Outstanding</th>
+            <th>Follow-up</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--yellow);">INV-2026-041</div>
+              <div style="font-size:10px; color:var(--gray);">Progress billing #2</div>
+            </td>
+            <td>
+              <div style="font-weight:600;">DFW Commercial Group</div>
+              <div style="font-size:11px; color:var(--gray);">Pinnacle Suites Ph.2</div>
+            </td>
+            <td style="font-weight:700; font-size:15px;">$18,200</td>
+            <td style="color:var(--gray); font-size:12px;">Apr 7, 2026</td>
+            <td><span class="days-badge days-late">32 days late</span></td>
+            <td style="font-size:11px; color:var(--gray);">Called Apr 21, Apr 30</td>
+            <td><button class="follow-btn" onclick="markFollowUp(this)">Follow Up</button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--yellow);">INV-2026-038</div>
+              <div style="font-size:10px; color:var(--gray);">Final billing</div>
+            </td>
+            <td>
+              <div style="font-weight:600;">Lone Star Industrial</div>
+              <div style="font-size:11px; color:var(--gray);">Morrison Cold Storage</div>
+            </td>
+            <td style="font-weight:700; font-size:15px;">$9,800</td>
+            <td style="color:var(--gray); font-size:12px;">Apr 12, 2026</td>
+            <td><span class="days-badge days-late">27 days late</span></td>
+            <td style="font-size:11px; color:var(--gray);">Email Apr 28</td>
+            <td><button class="follow-btn" onclick="markFollowUp(this)">Follow Up</button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--yellow);">INV-2026-044</div>
+              <div style="font-size:10px; color:var(--gray);">Progress billing #1</div>
+            </td>
+            <td>
+              <div style="font-weight:600;">Southwest Builders</div>
+              <div style="font-size:11px; color:var(--gray);">Ranch House Café</div>
+            </td>
+            <td style="font-weight:700; font-size:15px;">$4,500</td>
+            <td style="color:var(--gray); font-size:12px;">May 1, 2026</td>
+            <td><span class="days-badge days-warn">8 days</span></td>
+            <td style="font-size:11px; color:var(--gray);">Net-30 — not due yet</td>
+            <td><button class="follow-btn" onclick="markFollowUp(this)">Remind</button></td>
+          </tr>
+
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--yellow);">INV-2026-046</div>
+              <div style="font-size:10px; color:var(--gray);">Deposit / mobilization</div>
+            </td>
+            <td>
+              <div style="font-weight:600;">Hernandez Construction</div>
+              <div style="font-size:11px; color:var(--gray);">Skyline Office Buildout</div>
+            </td>
+            <td style="font-weight:700; font-size:15px;">$2,250</td>
+            <td style="color:var(--gray); font-size:12px;">May 5, 2026</td>
+            <td><span class="days-badge days-ok">4 days</span></td>
+            <td style="font-size:11px; color:var(--gray);">Net-30 — not due yet</td>
+            <td><button class="follow-btn" onclick="markFollowUp(this)">Remind</button></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- INVOICE SUMMARY -->
+    <div class="section-header" style="margin-top:24px;">
+      <div class="section-title" style="font-size:15px;">Summary</div>
+    </div>
+
+    <div class="grid-3">
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--red);">$28,000</div>
+        <div class="stat-label">Past Due (30+ days)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:var(--orange);">$6,750</div>
+        <div class="stat-label">Due Within 30 Days</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">4</div>
+        <div class="stat-label">Open Invoices</div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /main -->
+
+<script>
+  function showTab(name) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  function toggleCheck(item) {
+    const box = item.querySelector('.check-box');
+    const tag = item.querySelector('.status-tag');
+    if (box.classList.contains('checked')) {
+      box.classList.remove('checked');
+      box.textContent = '';
+      if (tag) { tag.className = 'status-tag status-needed'; tag.textContent = 'NEEDED'; }
+    } else {
+      box.classList.add('checked');
+      box.classList.remove('ordered');
+      box.textContent = '✓';
+      if (tag) { tag.className = 'status-tag status-onsite'; tag.textContent = 'ON-SITE'; }
+    }
+  }
+
+  function markFollowUp(btn) {
+    btn.textContent = 'Sent ✓';
+    btn.classList.add('sent');
+    btn.disabled = true;
+    const cell = btn.closest('tr').querySelector('td:nth-child(6)');
+    if (cell) {
+      const today = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      cell.textContent = 'Followed up ' + today;
+      cell.style.color = 'var(--green)';
+    }
+  }
+</script>
+
+</body>
+</html>

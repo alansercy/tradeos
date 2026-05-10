@@ -1,0 +1,8 @@
+# Netlify
+.netlify
+
+# Netlify workaround copy
+index.html
+
+# Claude/GSD planning
+.claude/
